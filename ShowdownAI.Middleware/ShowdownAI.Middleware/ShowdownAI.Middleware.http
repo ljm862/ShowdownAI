@@ -1,0 +1,6 @@
+@ShowdownAI.Middleware_HostAddress = http://localhost:5080
+
+GET {{ShowdownAI.Middleware_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
