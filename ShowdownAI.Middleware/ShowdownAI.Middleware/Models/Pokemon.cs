@@ -13,8 +13,8 @@
         public List<string> Moves { get; set; }
         public string Pokeball { get; set; }
         public bool Reviving { get; set; }
-        public Stats Stats { get; set; } 
-        public Status Status {get ; set;}
+        public Stats Stats { get; set; }
+        public Status Status { get; set; }
         public string Terastallized { get; set; }
         public string TeraType { get; set; }
 
