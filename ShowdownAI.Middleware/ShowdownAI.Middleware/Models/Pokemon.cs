@@ -16,7 +16,7 @@
         public Stats Stats { get; set; }
         public Status Status { get; set; }
         public string Terastallized { get; set; }
-        public string TeraType { get; set; }
+        public TypeName TeraType { get; set; }
         public TypeName Type { get; set; }
     }
 }
