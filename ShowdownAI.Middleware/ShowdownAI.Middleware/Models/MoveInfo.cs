@@ -10,6 +10,7 @@
         public int Pp { get; set; }
         public int Maxpp { get; set; }
         public string Target { get; set; }
+        public TargetType TargetType { get; set; }
         public bool Disabled { get; set; }
     }
 }
