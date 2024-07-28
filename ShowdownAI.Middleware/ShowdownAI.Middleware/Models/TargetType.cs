@@ -5,23 +5,23 @@
         None,
 
         // single-target
-        normal,
-        any,
-        adjacentAlly,
-        adjacentFoe,
-        adjacentAllyOrSelf,
+        Normal,
+        Any,
+        AdjacentAlly,
+        AdjacentFoe,
+        AdjacentAllyOrSelf,
 
         // single-target, automatic
-        self,
-        randomNormal,
+        Self,
+        RandomNormal,
 
         // spread
-	    allAdjacent,
-        allAdjacentFoes,
+        AllAdjacent,
+        AllAdjacentFoes,
 
         // side and field
-        allySide,
-        foeSide,
-        all 
+        AllySide,
+        FoeSide,
+        All
     }
 }
