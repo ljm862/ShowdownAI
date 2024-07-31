@@ -10,6 +10,7 @@
         public string Details { get; set; }
         public string Ident { get; set; }
         public string Item { get; set; }
+        public int Level { get; set; }
         public List<string> Moves { get; set; }
         public string Pokeball { get; set; }
         public bool Reviving { get; set; }

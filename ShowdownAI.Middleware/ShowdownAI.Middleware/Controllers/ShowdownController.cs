@@ -19,7 +19,7 @@ namespace ShowdownAI.Middleware.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [Route("banana")]
+        [Route("act")]
         public async Task<IActionResult> NewTurn([FromBody] SideStatusRequest sideStatusRequest)
         {
             _moveSelector.BuildPrediction(sideStatusRequest);
@@ -28,8 +28,7 @@ namespace ShowdownAI.Middleware.Controllers
 
         private async Task<ShowdownAction> RunPrediction()
         {
-            var newMove = await Task.Run(() => _moveSelector.RunPrediction());
-            return newMove;
+            return await _moveSelector.RunPrediction();
         }
 
     }
