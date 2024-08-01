@@ -1,5 +1,8 @@
-﻿namespace ShowdownAI.Middleware.Models
+﻿using System.Text.Json.Serialization;
+
+namespace ShowdownAI.Middleware.Models
 {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum TypeName
     {
         None,
