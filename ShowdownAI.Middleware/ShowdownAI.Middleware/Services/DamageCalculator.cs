@@ -5,6 +5,7 @@ namespace ShowdownAI.Middleware.Services
     public class DamageCalculator
     {
         private readonly float randomRatio = 0.925f; // Mean value of the random roles
+        private readonly BattleTracker _battleTracker;
 
         public float WeatherMultiplier
         {
@@ -30,6 +31,11 @@ namespace ShowdownAI.Middleware.Services
         }
         private float? _typeEffectiveness;
 
+        public DamageCalculator(BattleTracker battleTracker)
+        {
+            _battleTracker = battleTracker;
+        }
+
         /// <summary>
         /// https://bulbapedia.bulbagarden.net/wiki/Damage
         /// </summary>
@@ -39,7 +45,7 @@ namespace ShowdownAI.Middleware.Services
         /// <returns></returns>
         public float ExpectedDamage(MoveInfo move, Pokemon attacker, Pokemon target)
         {
-            var gamma = (2.0f / 5 * attacker.Level) + 2;
+            var gamma = ((2.0f / 5) * attacker.Level) + 2;
             var alpha = ((gamma * move.Power * (move.Method == AttackMethod.Physical ? ((float)attacker.Stats.Atk / target.Stats.Def) : ((float)attacker.Stats.Spa / attacker.Stats.Spd))) / 50.0f) + 2;
             var damage = alpha * WeatherMultiplier * Critical * randomRatio * Stab * TypeEffectiveness * BurnCheck() * MiscChecks();
             return Math.Max(1, damage);
