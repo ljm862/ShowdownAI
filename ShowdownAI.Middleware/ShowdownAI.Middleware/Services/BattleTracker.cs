@@ -15,6 +15,11 @@ namespace ShowdownAI.Middleware.Services
 
         public ActivePokemon OurActivePokemon;
 
+        public Weather Weather;
+
+        public MoveInfo OurLastMove;
+        public MoveInfo TheirLastMove;
+
         public BattleTracker()
         {
             OurTeam = new();
