@@ -7,7 +7,7 @@ namespace ShowdownAI.Middleware.Services
 {
     public class MoveDataLookup
     {
-        private const string _moveDataPath = "./JsonMoveData/move_data.json";
+        private const string _moveDataPath = "./MoveData/move_data.json";
         private readonly string _jsonData;    
 
         public MoveDataLookup()
