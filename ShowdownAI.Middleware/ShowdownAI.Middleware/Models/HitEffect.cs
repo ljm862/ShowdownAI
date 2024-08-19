@@ -3,7 +3,7 @@
     public class HitEffect
     {
         // set pokemon conditions
-        //public ??? Boosts? { get; set; }
+        public Boosts? Boosts { get; set; }
         public string? Status { get; set; }
         public string? VolatileStatus { get; set; }
 

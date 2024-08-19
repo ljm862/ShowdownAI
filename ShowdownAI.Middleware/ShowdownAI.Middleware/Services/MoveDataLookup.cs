@@ -1,5 +1,6 @@
 ﻿using ShowdownAI.Middleware.Models;
 using System.Text.Json;
+using System.Reflection;
 
 
 namespace ShowdownAI.Middleware.Services
@@ -47,7 +48,7 @@ namespace ShowdownAI.Middleware.Services
                 case "accuracy":
                     // accuracy can be an int, or can be true denoting 100% accuracy
                     // currently set to int max value if true
-                    // future alternative - could create an accuracy class?
+                    // could chanage to be null or negative instead?
                     int accuracy;
                     bool isInt = moveAttribute.Value.TryGetInt32(out accuracy);
                     moveData.Accuracy = isInt ? accuracy : int.MaxValue;
@@ -56,7 +57,7 @@ namespace ShowdownAI.Middleware.Services
                     moveData.BasePower = moveAttribute.Value.GetInt32();
                     break;
                 case "category":
-                    string categoryString = moveAttribute.Value.GetString();                    
+                    string categoryString = moveAttribute.Value.GetString();
                     moveData.Method = (AttackMethod)Enum.Parse(typeof(AttackMethod), categoryString, ignoreCase: true);
                     break;
                 case "name":
@@ -69,15 +70,29 @@ namespace ShowdownAI.Middleware.Services
                     moveData.Priority = moveAttribute.Value.GetInt32();
                     break;
                 case "flags":
-                    // currently no flag property as likely need a flag class
+                    MoveFlags moveFlags = new();
+                    foreach (JsonProperty flag in moveAttribute.Value.EnumerateObject())
+                    {
+                        moveFlags.GetType().GetProperty(flag.Name.Substring(0, 1).ToUpper() + flag.Name.Substring(1)).SetValue(moveFlags, true, null);
+                    }
+                    moveData.Flags = moveFlags;
                     break;
                 case "target":
-                    string targetString = moveAttribute.Value.GetString();                    
+                    string targetString = moveAttribute.Value.GetString();
                     moveData.TargetType = (TargetType)Enum.Parse(typeof(TargetType), targetString, ignoreCase: true);
                     break;
                 case "type":
                     string typeString = moveAttribute.Value.GetString();
                     moveData.Type = (TypeName)Enum.Parse(typeof(TypeName), typeString, ignoreCase: true);
+                    break;
+                case "isNonStandard":
+                    moveData.IsNonStandard = moveAttribute.Value.GetString();
+                    break;
+                case "critRatio":
+                    moveData.CritRatio = moveAttribute.Value.GetInt32();
+                    break;
+                case "secondary":
+                    // needs implementing
                     break;
                 default:
                     Console.WriteLine($"Attribute {moveAttribute.Name} not able to map");
