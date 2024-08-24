@@ -56,16 +56,7 @@ namespace ShowdownAI.Middleware.Services
                     // accuracy can be an int, or can be true denoting 100% accuracy
                     // currently set to int max value if true
                     // could change to be null or negative instead?
-                    int accuracy;
-                    try
-                    {
-                        accuracy = moveAttribute.Value.GetInt32();
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        accuracy = int.MaxValue;
-                    }
-                    moveData.Accuracy = accuracy;
+                    moveData.Accuracy = moveAttribute.Value.ValueKind == JsonValueKind.Number ? moveAttribute.Value.GetInt32() : int.MaxValue;
                     break;
                 case "basePower":
                     moveData.BasePower = moveAttribute.Value.GetInt32();
