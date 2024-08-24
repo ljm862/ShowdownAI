@@ -8,37 +8,44 @@ namespace ShowdownAI.Middleware.Services
     public class MoveDataLookup
     {
         private const string _moveDataPath = "./MoveData/move_data.json";
-        private readonly string _jsonData;    
+        private readonly string _jsonData;
+
+        private Dictionary<string, MoveData> _moveData = new();
 
         public MoveDataLookup()
         {
             _jsonData = File.ReadAllText(_moveDataPath);
+            GenerateMoveData();
         }
 
-        public MoveData GetMoveData(string moveId)
+        public void GenerateMoveData()
         {
-            MoveData moveData = new() { Id = moveId };
-
             using (JsonDocument document = JsonDocument.Parse(_jsonData))
             {
                 JsonElement moves = document.RootElement.GetProperty("moves");
 
-                foreach (JsonElement move in moves.EnumerateArray())
+                foreach (JsonElement moveObject in moves.EnumerateArray())
                 {
-                    if (move.TryGetProperty(moveId, out JsonElement moveAttributes))
+                    JsonProperty move = moveObject.EnumerateObject().FirstOrDefault();
+
+                    MoveData moveData = new() { Id = move.Name };
+
+                    foreach (JsonProperty moveAttribute in move.Value.EnumerateObject())
                     {
-                        foreach (JsonProperty moveAttribute in moveAttributes.EnumerateObject())
-                        {
-                            AddAttributeToMoveData(moveAttribute, moveData);
-                        }
+                        AddAttributeToMoveData(moveAttribute, moveData);
                     }
+
+                    _moveData.Add(move.Name, moveData);
                 }
             }
-
-            return moveData;
         }
 
-        private void AddAttributeToMoveData(JsonProperty moveAttribute, MoveData moveData) 
+        public MoveData GetMoveData(string moveId)
+        {
+            return _moveData[moveId];
+        }
+
+        private void AddAttributeToMoveData(JsonProperty moveAttribute, MoveData moveData)
         {
             switch (moveAttribute.Name)
             {
@@ -48,10 +55,17 @@ namespace ShowdownAI.Middleware.Services
                 case "accuracy":
                     // accuracy can be an int, or can be true denoting 100% accuracy
                     // currently set to int max value if true
-                    // could chanage to be null or negative instead?
+                    // could change to be null or negative instead?
                     int accuracy;
-                    bool isInt = moveAttribute.Value.TryGetInt32(out accuracy);
-                    moveData.Accuracy = isInt ? accuracy : int.MaxValue;
+                    try
+                    {
+                        accuracy = moveAttribute.Value.GetInt32();
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        accuracy = int.MaxValue;
+                    }
+                    moveData.Accuracy = accuracy;
                     break;
                 case "basePower":
                     moveData.BasePower = moveAttribute.Value.GetInt32();
@@ -95,7 +109,7 @@ namespace ShowdownAI.Middleware.Services
                     // needs implementing
                     break;
                 default:
-                    Console.WriteLine($"Attribute {moveAttribute.Name} not able to map");
+                    //Console.WriteLine($"Attribute {moveAttribute.Name} not able to map");
                     break;
             }
         }
