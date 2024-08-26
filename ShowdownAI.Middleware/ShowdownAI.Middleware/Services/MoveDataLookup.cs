@@ -41,8 +41,10 @@ namespace ShowdownAI.Middleware.Services
         }
 
         public MoveData GetMoveData(string moveId)
-        {
-            return _moveData[moveId];
+        {            
+            bool success = _moveData.TryGetValue(moveId, out MoveData value);
+            if (!success) Console.WriteLine($"Could not find move with id: {moveId}");
+            return value;
         }
 
         private void AddAttributeToMoveData(JsonProperty moveAttribute, MoveData moveData)
@@ -100,7 +102,7 @@ namespace ShowdownAI.Middleware.Services
                     // needs implementing
                     break;
                 default:
-                    //Console.WriteLine($"Attribute {moveAttribute.Name} not able to map");
+                    Console.WriteLine($"Attribute {moveAttribute.Name} not able to map");
                     break;
             }
         }
