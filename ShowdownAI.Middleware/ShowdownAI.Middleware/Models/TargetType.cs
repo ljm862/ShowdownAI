@@ -13,6 +13,7 @@
 
         // single-target, automatic
         Self,
+        Scripted,
         RandomNormal,
 
         // spread
@@ -20,6 +21,8 @@
         AllAdjacentFoes,
 
         // side and field
+        Allies,
+        AllyTeam,
         AllySide,
         FoeSide,
         All
