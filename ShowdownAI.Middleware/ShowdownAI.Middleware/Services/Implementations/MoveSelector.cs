@@ -5,17 +5,18 @@ namespace ShowdownAI.Middleware.Services.Implementations
 {
     public class MoveSelector : IMoveSelector
     {
-        private readonly BattleTracker battleTracker;
+        private readonly BattleTracker _battleTracker;
 
         public MoveSelector()
         {
-            battleTracker = new();
+            _battleTracker = new();
         }
+
         public void BuildPrediction(SideStatusRequest sideStatusRequest)
         {
             // Stores/updates the db with the latest request
             // Creates a prediction unit
-            battleTracker.OurActivePokemon = sideStatusRequest.Active[0];
+            _battleTracker.UpdateTurnStart(ActivePokemon.DefaultActivePokemon(), Pokemon.DefaultPokemon(), Pokemon.DefaultPokemon());
             Console.WriteLine("Building Prediction");
         }
 
@@ -23,24 +24,27 @@ namespace ShowdownAI.Middleware.Services.Implementations
         {
             return await Task.Run(() =>
             {
-                var bestMove = 0;
-                var topDmg = 0f;
-                for (int i = 0; i < battleTracker.OurActivePokemon.Moves.Count; i++)
-                {
-                    var damageCalculator = new DamageCalculator();
-                    var dmg = damageCalculator.ExpectedDamage(battleTracker.OurActivePokemon.Moves[i], battleTracker.OurCurrentPokemon, battleTracker.TheirCurrentPokemon);
-                    if (topDmg <= dmg)
-                    {
-                        topDmg = dmg;
-                        bestMove = i + 1;
-                    }
-                }
-                return (ShowdownAction)bestMove;
-
+                return GetBestMove();
             });
 
         }
 
+        private ShowdownAction GetBestMove()
+        {
+            var bestMove = 0;
+            var topDmg = 0f;
+            var damageCalculator = new DamageCalculator(_battleTracker);
 
+            for (int i = 0; i < _battleTracker.OurActivePokemon.Moves.Count; i++)
+            {
+                var dmg = damageCalculator.ExpectedDamage(_battleTracker.OurActivePokemon.Moves[i], _battleTracker.OurCurrentPokemon, _battleTracker.TheirCurrentPokemon);
+                if (topDmg < dmg)
+                {
+                    topDmg = dmg;
+                    bestMove = i + 1;
+                }
+            }
+            return (ShowdownAction)bestMove;
+        }
     }
 }

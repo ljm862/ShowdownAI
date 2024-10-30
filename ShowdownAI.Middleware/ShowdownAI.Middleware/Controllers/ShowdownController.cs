@@ -10,6 +10,7 @@ namespace ShowdownAI.Middleware.Controllers
     public class ShowdownController() : Controller
     {
         private static readonly MoveSelector _moveSelector = new MoveSelector();
+        private static readonly BattleTracker _battleTracker = new BattleTracker();
         private static readonly MoveDataLookup _moveDataLookup = new MoveDataLookup();
 
         [HttpGet]
@@ -26,6 +27,16 @@ namespace ShowdownAI.Middleware.Controllers
             return _moveDataLookup.GetMoveData(id);
         }
 
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Route("update")]
+        public async Task<IActionResult> UpdateBattle([FromBody]string updateString)
+        {
+            _battleTracker.Update(updateString);
+            return Ok();
+        }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
