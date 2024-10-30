@@ -1,4 +1,6 @@
-﻿namespace ShowdownAI.Middleware.Models
+﻿using ShowdownAI.Middleware.Services;
+
+namespace ShowdownAI.Middleware.Models
 {
     public class ActivePokemon
     {
@@ -16,9 +18,7 @@
                 Move = "Hit",
                 Power = 80,
                 Pp = 16,
-                Target = "normal",
-                TargetType = TargetType.Normal,
-                TypeName = TypeName.Water
+                Target = "normal"
             };
             return new ActivePokemon
             {

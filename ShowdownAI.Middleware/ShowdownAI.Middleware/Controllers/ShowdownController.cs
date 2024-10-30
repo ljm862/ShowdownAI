@@ -1,17 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ShowdownAI.Middleware.Models;
-using ShowdownAI.Middleware.Services;
-using ShowdownAI.Middleware.Services.Implementations;
+using ShowdownAI.Middleware.Services.Interfaces;
 
 namespace ShowdownAI.Middleware.Controllers
 {
     [ApiController]
     [Route("api/showdown")]
-    public class ShowdownController() : Controller
+    public class ShowdownController : Controller
     {
-        private static readonly MoveSelector _moveSelector = new MoveSelector();
-        private static readonly BattleTracker _battleTracker = new BattleTracker();
-        private static readonly MoveDataLookup _moveDataLookup = new MoveDataLookup();
+        private readonly IMoveDataLookup _moveDataLookup;
+        private readonly IMoveSelector _moveSelector;
+        private readonly IBattleTracker _battleTracker;
+        private readonly ITypeLookup _typeLookup;
+
+        public ShowdownController(IMoveDataLookup moveDataLookup, IMoveSelector moveSelector, IBattleTracker battleTracker, ITypeLookup typeLookup)
+        {
+            _moveDataLookup = moveDataLookup;
+            _moveSelector = moveSelector;
+            _battleTracker = battleTracker;
+            _typeLookup = typeLookup;
+        }
 
         [HttpGet]
         [Route("test")]
@@ -32,7 +40,7 @@ namespace ShowdownAI.Middleware.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Route("update")]
-        public async Task<IActionResult> UpdateBattle([FromBody]string updateString)
+        public async Task<IActionResult> UpdateBattle([FromBody] string updateString)
         {
             _battleTracker.Update(updateString);
             return Ok();

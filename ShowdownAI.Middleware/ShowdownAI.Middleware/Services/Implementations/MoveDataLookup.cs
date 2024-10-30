@@ -1,26 +1,37 @@
 ﻿using ShowdownAI.Middleware.Models;
 using System.Text.Json;
 using System.Reflection;
+using ShowdownAI.Middleware.Services.Interfaces;
 
 
-namespace ShowdownAI.Middleware.Services
+namespace ShowdownAI.Middleware.Services.Implementations
 {
-    public class MoveDataLookup
+    public class MoveDataLookup : IMoveDataLookup
     {
         private const string _moveDataPath = "./MoveData/move_data.json";
-        private readonly string _jsonData;
 
         private Dictionary<string, MoveData> _moveData = new();
 
         public MoveDataLookup()
         {
-            _jsonData = File.ReadAllText(_moveDataPath);
             GenerateMoveData();
         }
 
-        public void GenerateMoveData()
+        public MoveData GetDefaultMove()
         {
-            using (JsonDocument document = JsonDocument.Parse(_jsonData))
+            return GetMoveData("tackle");
+        }
+
+        public MoveData GetMoveData(string moveId)
+        {
+            bool success = _moveData.TryGetValue(moveId, out MoveData value);
+            if (!success) Console.WriteLine($"Could not find move with id: {moveId}");
+            return value;
+        }
+
+        private void GenerateMoveData()
+        {
+            using (JsonDocument document = JsonDocument.Parse(File.ReadAllText(_moveDataPath)))
             {
                 JsonElement moves = document.RootElement.GetProperty("moves");
 
@@ -38,13 +49,6 @@ namespace ShowdownAI.Middleware.Services
                     _moveData.Add(move.Name, moveData);
                 }
             }
-        }
-
-        public MoveData GetMoveData(string moveId)
-        {            
-            bool success = _moveData.TryGetValue(moveId, out MoveData value);
-            if (!success) Console.WriteLine($"Could not find move with id: {moveId}");
-            return value;
         }
 
         private void AddAttributeToMoveData(JsonProperty moveAttribute, MoveData moveData)

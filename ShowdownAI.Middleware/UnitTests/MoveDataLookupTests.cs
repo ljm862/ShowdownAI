@@ -1,6 +1,6 @@
 using KellermanSoftware.CompareNetObjects;
 using ShowdownAI.Middleware.Models;
-using ShowdownAI.Middleware.Services;
+using ShowdownAI.Middleware.Services.Implementations;
 
 namespace UnitTests
 {

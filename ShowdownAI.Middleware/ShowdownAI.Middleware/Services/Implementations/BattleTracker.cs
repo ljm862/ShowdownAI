@@ -1,11 +1,12 @@
 ﻿using ShowdownAI.Middleware.Models;
+using ShowdownAI.Middleware.Services.Interfaces;
 
-namespace ShowdownAI.Middleware.Services
+namespace ShowdownAI.Middleware.Services.Implementations
 {
     /// <summary>
     /// Acts as the memory part of the brain. Remembers which pokemon are on the field, which pokemon the opponent has that it has seen, items, moves, abilities, etc.
     /// </summary>
-    public class BattleTracker
+    public class BattleTracker : IBattleTracker
     {
         public List<Pokemon> OurTeam;
         public List<Pokemon> TheirTeam;
@@ -20,6 +21,8 @@ namespace ShowdownAI.Middleware.Services
         public MoveInfo OurLastMove;
         public MoveInfo TheirLastMove;
 
+        public MoveDataLookup MoveDataLookup;
+
         public BattleTracker()
         {
             OurTeam = new();
@@ -27,6 +30,12 @@ namespace ShowdownAI.Middleware.Services
             OurCurrentPokemon = new();
             TheirCurrentPokemon = new();
         }
+
+        public ActivePokemon GetActivePokemon() => OurActivePokemon;
+        public Pokemon GetOurCurrentPokemon() => OurCurrentPokemon;
+        public Pokemon GetTheirCurrentPokemon() => TheirCurrentPokemon;
+
+        public Weather GetCurrentWeather() => Weather;
 
         public void Update(string updateString)
         {

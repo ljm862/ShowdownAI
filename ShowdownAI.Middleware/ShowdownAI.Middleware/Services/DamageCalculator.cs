@@ -1,14 +1,15 @@
 ﻿using ShowdownAI.Middleware.Models;
+using ShowdownAI.Middleware.Services.Interfaces;
 
 namespace ShowdownAI.Middleware.Services
 {
     public class DamageCalculator
     {
-        private readonly BattleTracker _battleTracker;
+        private readonly IBattleTracker _battleTracker;
 
         private readonly float randomRatio = 0.925f; // Mean value of the random roles
 
-        public DamageCalculator(BattleTracker battleTracker)
+        public DamageCalculator(IBattleTracker battleTracker)
         {
             _battleTracker = battleTracker;
         }
@@ -20,51 +21,55 @@ namespace ShowdownAI.Middleware.Services
         /// <param name="attacker"></param>
         /// <param name="target"></param>
         /// <returns></returns>
-        public float ExpectedDamage(MoveInfo move, Pokemon attacker, Pokemon target)
+        public float ExpectedDamage(MoveData move, Pokemon attacker, Pokemon target)
         {
-            var effectiveness = CalculateTypeEffectiveness(move.TypeName, target);
+            var effectiveness = CalculateTypeEffectiveness(move.Type, target);
+            Console.WriteLine($"Type Effectiveness of [{move.Name}] is {effectiveness}");
             if (effectiveness == 0f) return 0f;
 
-            var gamma = ((2.0f / 5) * attacker.Level) + 2;
-            var alpha = ((gamma * move.Power * (move.Method == AttackMethod.Physical ? ((float)attacker.Stats.Atk / target.Stats.Def) : ((float)attacker.Stats.Spa / attacker.Stats.Spd))) / 50.0f) + 2;
-            var damage = alpha * CalculateWeatherMultiplier(move, attacker, target) * CalculateCritical(move, attacker, target) * randomRatio * CalculateStab(move.TypeName, attacker) * effectiveness * BurnCheck(move, attacker) * MiscChecks();
+            var gamma = ((2.0f / 5.0f) * (float)attacker.Level) + 2f;
+            Console.WriteLine($"Gamma is [{gamma}]");
+            var alpha = ((gamma * move.BasePower * (move.Method == AttackMethod.Physical ? ((float)attacker.Stats.Atk / target.Stats.Def) : ((float)attacker.Stats.Spa / attacker.Stats.Spd))) / 50.0f) + 2;
+            Console.WriteLine($"Alpha is [{alpha}]");
+            var damage = alpha * CalculateWeatherMultiplier(move, attacker, target) * CalculateCritical(move, attacker, target) * randomRatio * CalculateStab(move.Type, attacker) * effectiveness * BurnCheck(move, attacker) * MiscChecks();
             return Math.Max(1, damage);
         }
 
 
-        private float CalculateWeatherMultiplier(MoveInfo move, Pokemon attacker, Pokemon target)
+        private float CalculateWeatherMultiplier(MoveData move, Pokemon attacker, Pokemon target)
         {
             if (attacker.Ability == "cloudnine" || attacker.Ability == "airlock" || target.Ability == "cloudnine" || target.Ability == "airlock") return 1f;
 
-            var weather = _battleTracker.Weather;
+            var weather = _battleTracker.GetCurrentWeather();
             var baseValue = 1f;
             if (weather == Weather.Rain)
             {
-                if (move.TypeName == TypeName.Water)
+                if (move.Type == TypeName.Water)
                 {
                     baseValue = 1.5f;
                 }
-                if (move.TypeName == TypeName.Fire)
+                if (move.Type == TypeName.Fire)
                 {
                     baseValue = 0.5f;
                 }
             }
             if (weather == Weather.Sunlight)
             {
-                if (move.TypeName == TypeName.Water)
+                if (move.Type == TypeName.Water)
                 {
                     baseValue = 0.5f;
                 }
-                if (move.TypeName == TypeName.Fire || move.Move == "hydrostream")
+                if (move.Type == TypeName.Fire || move.Id == "hydrostream")
                 {
                     baseValue = 1.5f;
                 }
             }
+            Console.WriteLine($"Weather Multiplier for [{move.Name}] is {baseValue}");
             return baseValue;
         }
 
         // Tried to get an average value output for this. Not sure if my maths is done right
-        private float CalculateCritical(MoveInfo move, Pokemon attacker, Pokemon target)
+        private float CalculateCritical(MoveData move, Pokemon attacker, Pokemon target)
         {
             if (target.Ability == "battlearmor" || target.Ability == "shellarmor") return 1f;
             var stage = 0;
@@ -96,6 +101,7 @@ namespace ShowdownAI.Middleware.Services
             var baseValue = (0.5f * baseChance) + 1;
             if (attacker.Ability == "sniper") baseValue *= 1.5f;
 
+            Console.WriteLine($"Critical Multiplier for [{move.Name}] is {baseValue}");
             return baseValue;
         }
 
@@ -109,6 +115,8 @@ namespace ShowdownAI.Middleware.Services
             {
                 baseValue = moveType == attacker.Type2 ? multiplier : 1f;
             }
+
+            Console.WriteLine($"STAB is {baseValue}");
             return baseValue;
         }
 
@@ -123,7 +131,7 @@ namespace ShowdownAI.Middleware.Services
             return baseValue;
         }
 
-        private float BurnCheck(MoveInfo move, Pokemon attacker)
+        private float BurnCheck(MoveData move, Pokemon attacker)
         {
             if (attacker.Status == Status.brn)
             {
