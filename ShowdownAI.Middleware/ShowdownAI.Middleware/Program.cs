@@ -1,4 +1,3 @@
-
 using ShowdownAI.Middleware.Services.Implementations;
 using ShowdownAI.Middleware.Services.Interfaces;
 
@@ -16,6 +15,10 @@ namespace ShowdownAI.Middleware
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddSingleton<IMoveDataLookup, MoveDataLookup>();
+            builder.Services.AddSingleton<IMoveSelector, MoveSelector>();
+            builder.Services.AddSingleton<IBattleTracker, BattleTracker>();
+            builder.Services.AddSingleton<ITypeLookup, TypeLookup>();
 
             var app = builder.Build();
 

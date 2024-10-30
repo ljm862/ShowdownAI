@@ -13,7 +13,5 @@
         public int Power { get; set; }
         public int Pp { get; set; }
         public string Target { get; set; }
-        public TargetType TargetType { get; set; }
-        public TypeName TypeName { get; set; }
     }
 }
