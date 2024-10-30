@@ -11,12 +11,22 @@ namespace ShowdownAI.Middleware.Controllers
     {
         private static readonly MoveSelector _moveSelector = new MoveSelector();
         private static readonly BattleTracker _battleTracker = new BattleTracker();
+        private static readonly MoveDataLookup _moveDataLookup = new MoveDataLookup();
 
         [HttpGet]
+        [Route("test")]
         public int Test()
         {
             return 1;
         }
+
+        [HttpGet]
+        [Route("moveDataLookup/{id}")]
+        public MoveData GetMoveInfoById(string id)
+        {
+            return _moveDataLookup.GetMoveData(id);
+        }
+
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]

@@ -3,3 +3,6 @@ ShowdownAI.Middleware/ShowdownAI.Middleware/obj/
 ShowdownAI.Middleware/.vs
 node_modules
 .env
+ShowdownAI.Middleware/packages/
+ShowdownAI.Middleware/UnitTests/bin/
+ShowdownAI.Middleware/UnitTests/obj/
